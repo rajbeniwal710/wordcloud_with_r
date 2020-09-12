@@ -1,34 +1,40 @@
-setwd("C:/Users/king/Desktop/project1")
-readLines("calories.txt")
-text_ <- readLines("calories.txt")
+setwd("C:/Users/king/Documents/GitHub/wordcloud_with_r")
+speech <- readLines("nehru_speech.txt")
+#importing the libraries
 library(tm)
 library(wordcloud)
 library(RColorBrewer)
 library(dplyr)
-
+library(wordcloud2)
+library(ggplot2)
 
 
 #creating a corpus
-docs_ <- Corpus(VectorSource(text_))
+corpus <- Corpus(VectorSource(speech))
 
 #data cleaning
-docs_ <- docs_ %>%
-  tm_map(removeNumbers) %>%
-  tm_map(removePunctuation) %>%
-  tm_map(stripWhitespace)
-docs_ <- tm_map(docs_, content_transformer(tolower))
-docs_ <- tm_map(docs_,removeWords,c(stopwords("english"),"calorie","can","people","may"))
+corpus <- corpus %>%
+  tm_map(removePunctuation) %>% #removing punctuation
+  tm_map(stripWhitespace) #striping whitespaces
+corpus <- tm_map(corpus, content_transformer(tolower)) #transform the corpus into lowercase to make uniformity 
+corpus <- tm_map(corpus,removeWords,stopwords(kind = "en")) #remove common english words
 
 #creating a document termes marix
-dtm <- TermDocumentMatrix(docs_)
-mat <- as.matrix(dtm)
+dtm <- TermDocumentMatrix(corpus)
+mat <- as.matrix(dtm) #creating a matrix
 words <- sort(rowSums(mat))
 df <- data.frame(word = names(words), freq = words)
 df <- df[order(df$freq, decreasing = TRUE),]
-head(df)
+rownames(df) <- NULL
+
 #creating wordcloud
-library(wordcloud2)
 set.seed(1234)
 
 wordcloud2(data = df,color = "random-dark",backgroundColor = "black")
+#rows subsettting for freq greater than 2
+df_plot <- filter(df, df$freq > 2)
 
+#plot
+barplot(height=df_plot$freq, names=df_plot$word, 
+        col="#69b3a2",
+        horiz=T, las=1)
