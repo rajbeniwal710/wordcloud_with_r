@@ -1,4 +1,4 @@
-setwd("C:/Users/king/Documents/GitHub/wordcloud_with_r")
+setwd(".....wordcloud_with_r")
 speech <- readLines("nehru_speech.txt")
 #importing the libraries
 library(tm)
